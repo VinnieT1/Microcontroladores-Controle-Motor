@@ -7,7 +7,10 @@ typedef enum State {
 
 State state = FUNCTION_SELECTION;
 
-LiquidCrystal lcd(9, 8, 4, 5, 6, 7);
+LiquidCrystal lcd(3, 2, 4, 5, 6, 7);
+
+const int button_pin = 8;
+const int pwm_pin = 10;
 
 // Time and PWM variables
 float output_value = 0;
@@ -53,9 +56,9 @@ void loop()
       break;
     case RUNNING:
       elapsed_time = millis() - start_time;
-      output_value = *(functions[function_index])(elapsed_time/1000);
+      output_value = functions[function_index](elapsed_time/1000);
       
-      analogWrite(10, 255*output_value);
+      analogWrite(pwm_pin, 255*output_value);
       
       handle_display_percentage(output_value);
       break;
@@ -80,25 +83,25 @@ void handle_display_percentage(float percentage) {
 // Function to detect button press (short and long press)
 void detectButtonPress() {
   // Read the state of the button
-  int reading = digitalRead(buttonPin);
-  unsigned long buttonPressStartTime = 0; // Time when button press started
+  int reading = digitalRead(button_pin);
+  unsigned long button_press_start_time = 0; // Time when button press started
   
   // Check if the button state has changed
   if (reading != last_button_state) {
-    lastDebounceTime = millis();  // Reset debounce timer
+    last_debounce_time = millis();  // Reset debounce timer
     long_press_detected = false;    // Reset long press flag when state changes
     short_press_detected = false;   // Reset short press flag when state changes
   }
 
   // If enough time has passed since the last state change, update the state
-  if ((millis() - lastDebounceTime) > debounceDelay) {
+  if ((millis() - last_debounce_time) > debounce_delay) {
     // If the button state has changed to LOW (pressed), start timing the press
     if (reading == LOW && last_button_state == HIGH) {
-      buttonPressStartTime = millis();  // Start counting time for the press
+      button_press_start_time = millis();  // Start counting time for the press
     }
 
     // If the button is held down, check for a long press (e.g., 2 seconds)
-    if (reading == LOW && (millis() - buttonPressStartTime) >= 2000 && !long_press_detected) {
+    if (reading == LOW && (millis() - button_press_start_time) >= 2000 && !long_press_detected) {
       // Long press detected (2 seconds or more)
       long_press_detected = true;  // Set flag to prevent repeated long press detection
     }
