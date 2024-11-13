@@ -8,6 +8,7 @@ typedef enum State {
 State state = FUNCTION_SELECTION;
 
 LiquidCrystal lcd(3, 2, 4, 5, 6, 7);
+int last_display_update;
 
 const int button_pin = 8;
 const int pwm_pin = 10;
@@ -37,7 +38,6 @@ void setup()
   Serial.begin(9600);
   lcd.begin(16, 2);
   
-  start_time = millis();
   handle_display_function();
 }
 void loop()
@@ -48,6 +48,8 @@ void loop()
 
       if (long_press_detected) {
         state = RUNNING;
+        last_display_update = millis();
+        start_time = millis();
       }
       else if (short_press_detected) {
         function_index = (function_index + 1) % 3;
@@ -60,7 +62,10 @@ void loop()
       
       analogWrite(pwm_pin, 255*output_value);
       
-      handle_display_percentage(output_value);
+      if (millis() - last_display_update > 100) {
+        handle_display_percentage(output_value);
+        last_display_update = millis();
+      }
       break;
   }
 }
