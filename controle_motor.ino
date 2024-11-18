@@ -1,3 +1,12 @@
+/*
+  GRUPO: 
+    Gabriel Lucas Bento Germano
+    Vinicius Teixeira Pereira Ramos
+    Victor Alexandre da Rocha Monteiro Miranda
+
+  PERÍODO: 2024.1
+*/
+
 #include <LiquidCrystal.h>
 
 typedef enum State {
